@@ -1,59 +1,73 @@
-// Constructor
- function Chronometer() {
+class Chronometer {
+  constructor() {
     this.currentTime = 0;
-    this.intervalId = 0;
-    this.segundos =0;
-    this.minutos = 0;
-    this.milis =0;
- }
+    this.intervalId;
+    this.currentMilis = 0;
+  }
 
- Chronometer.prototype.startClick = function () {
-    this.intervalId = setInterval(()=>{
-    this.currentTime ++;
-    this.setTime();
-    printTime() 
-    },1000);
- };
-
- Chronometer.prototype.setMinutes = function () {
-     minutos = Math.floor(this.currentTime/60);
-     return minutos;
- };
-
- Chronometer.prototype.setSeconds = function () {
-    segundos = this.currentTime % 60;
-    return segundos;
- };
-
- Chronometer.prototype.twoDigitsNumber = function (valor) {
-     if ( valor < 10 ){
-         return "0" + valor;
-     }
-     return valor.toString();
- };
-
- Chronometer.prototype.setTime = function () {
-     this.minutos=this.twoDigitsNumber(this.setMinutes());
-     this.segundos=this.twoDigitsNumber(this.setSeconds());
-     //this.milis=this.twoDigitsNumber(this.setMilliseconds());
- };
-
- /*Chronometer.prototype.setMilliseconds = function () {
-     this.intervalId = setInterval(() => {
-     this.milis ++;
-      if (this.milis < 99) {
-        clearInterval(this.intervalIdMilis);
-      }
+  startClick() {
+    this.intervalId = setInterval(() => {
+      this.currentMilis++;
+      this.currentTime = Math.floor(this.currentMilis / 100);
       this.setTime();
-      printTime();
-    }, 1); return this.milis;
-     };*/
+    }, 10);
+    btnLeft.innerText = "STOP";
+    btnRight.innerText = "SPLIT";
+  }
+  getMinutes = () => Math.floor(this.currentTime / 60);
 
- Chronometer.prototype.stopClick = function () {
-     clearInterval(this.intervalId);
- };
+  getSeconds = () => this.currentTime;
 
- Chronometer.prototype.resetClick = function () {
+  twoDigitsNumber = number => `${number}`.padStart(2, "0");
+
+  setTime() {
+    let minutes = this.twoDigitsNumber(this.getMinutes());
+    let seconds = this.twoDigitsNumber(this.getSeconds() % 60);
+    let milis = this.twoDigitsNumber(this.setMilliseconds());
+    milUni.innerText = milis[1];
+    milDec.innerText = milis[0];
+    secUni.innerText = seconds[1];
+    secDec.innerText = seconds[0];
+    minUni.innerText = minutes[1];
+    minDec.innerText = minutes[0];
+    return `${minutes}:${seconds}:${milis}`;
+  }
+  setMilliseconds() {
+    return this.currentMilis % 100;
+  }
+  stopClick() {
     clearInterval(this.intervalId);
-    this.setTime()=0;
- };
+    btnLeft.innerText = "START";
+    btnRight.innerText = "RESET";
+  }
+  resetClick() {
+    this.currentTime = 0;
+    this.currentMilis = 0;
+    this.setTime();
+    splits.innerHTML = "";
+  }
+
+  splitClick() {
+    let split = document.createElement("li");
+    let splitText = document.createTextNode(chronometer.setTime());
+    split.appendChild(splitText);
+    splits.appendChild(split);
+  }
+}
+
+const chronometer = new Chronometer();
+
+btnLeft.onclick = () => {
+  btnLeft.classList.toggle("start");
+  btnLeft.classList.toggle("stop");
+  btnRight.classList.toggle("reset");
+  btnRight.classList.toggle("split");
+  btnLeft.innerText === "START"
+    ? chronometer.startClick()
+    : chronometer.stopClick();
+};
+
+btnRight.onclick = () =>
+  btnRight.innerText === "RESET"
+    ? chronometer.resetClick()
+    : chronometer.splitClick();
